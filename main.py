@@ -24,10 +24,9 @@ images = image_manager.load_all_images()
 player = Player(1, 1, images['player'], TILE_SIZE)
 
 # Initialize level objects
-level = Level(TILE_SIZE)
+level = Level(TILE_SIZE, images)
 
 clock = pygame.time.Clock()
-speed = 5  # You can adjust this value to control the player's movement speed
 
 while True:
     for event in pygame.event.get():
@@ -35,18 +34,11 @@ while True:
             pygame.quit()
             sys.exit()
 
-        player.update(event)
+    keys = pygame.key.get_pressed()
+    player.update(keys, level)
 
     # Draw level and player
-    screen.fill((0, 0, 0))
-    for y, row in enumerate(level.level_data):
-        for x, tile in enumerate(row):
-            if tile == 0:
-                screen.blit(images['grass'], (x * TILE_SIZE, y * TILE_SIZE))
-            elif tile == 1:
-                screen.blit(images['brick'], (x * TILE_SIZE, y * TILE_SIZE))
-            elif tile == 2:
-                screen.blit(images['wall'], (x * TILE_SIZE, y * TILE_SIZE))
+    level.draw(screen)
     player.draw(screen)
 
     pygame.display.flip()
