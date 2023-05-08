@@ -1,5 +1,8 @@
 import pygame
 import sys
+from player import Player
+from level import Level
+from image_manager import ImageManager
 
 # Initialize Pygame
 pygame.init()
@@ -10,64 +13,21 @@ SCREEN_WIDTH = 19 * TILE_SIZE
 SCREEN_HEIGHT = 15 * TILE_SIZE
 
 # Create the display
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption('Basic Pygame Project')
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
+pygame.display.set_caption('Master Blaster')
 
-
-# Load images
-def load_images():
-    images = {
-        'grass': pygame.transform.scale(pygame.image.load('grass_tile.png'), (TILE_SIZE, TILE_SIZE)),
-        'brick': pygame.transform.scale(pygame.image.load('brick_tile.png'), (TILE_SIZE, TILE_SIZE)),
-        'wall': pygame.transform.scale(pygame.image.load('wall_tile.png'), (TILE_SIZE, TILE_SIZE)),
-        #'bomb': pygame.transform.scale(pygame.image.load('bomb_sprite.png'), (TILE_SIZE, TILE_SIZE)),
-        'player': pygame.transform.scale(pygame.image.load('bomb_sprite.png'), (TILE_SIZE, TILE_SIZE))
-    }
-    return images
-
-# Define the level (0 = grass, 1 = bricks, 2 = wall)
-level = [
-    [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-    [2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
-    [2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-    [2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-    [2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
-    [2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-    [2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-    [2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
-    [2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-    [2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-    [2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
-    [2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-    [2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-    # ... Add more rows to complete the level
-]
-asdasdasd
-
-
-
-# Player class
-class Player:
-    def __init__(self, x, y, image):
-        self.x = x
-        self.y = y
-        self.image = image
-        self.rect = self.image.get_rect(topleft=(x * TILE_SIZE, y * TILE_SIZE))
-
-    def move(self, dx, dy):
-        self.rect.move_ip(dx * TILE_SIZE, dy * TILE_SIZE)
-
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
+# Initialize image manager
+image_manager = ImageManager(TILE_SIZE)
+images = image_manager.load_all_images()
 
 # Initialize game objects
-images = load_images()
-player = Player(1, 1, images['player'])
+player = Player(1, 1, images['player'], TILE_SIZE)
 
-# Main game loop
+# Initialize level objects
+level = Level(TILE_SIZE)
+
 clock = pygame.time.Clock()
+speed = 5  # You can adjust this value to control the player's movement speed
 
 while True:
     for event in pygame.event.get():
@@ -75,20 +35,11 @@ while True:
             pygame.quit()
             sys.exit()
 
-        # Player movement
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                player.move(0, -1)
-            elif event.key == pygame.K_DOWN:
-                player.move(0, 1)
-            elif event.key == pygame.K_LEFT:
-                player.move(-1, 0)
-            elif event.key == pygame.K_RIGHT:
-                player.move(1, 0)
+        player.update(event)
 
     # Draw level and player
     screen.fill((0, 0, 0))
-    for y, row in enumerate(level):
+    for y, row in enumerate(level.level_data):
         for x, tile in enumerate(row):
             if tile == 0:
                 screen.blit(images['grass'], (x * TILE_SIZE, y * TILE_SIZE))
