@@ -44,6 +44,8 @@ level = [
     [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
     # ... Add more rows to complete the level
 ]
+asdasdasd
+
 
 
 # Player class

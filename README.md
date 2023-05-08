@@ -1,2 +1,2 @@
 # Bomberman
- A multiplayer game made in Python
+ A game made using Python
