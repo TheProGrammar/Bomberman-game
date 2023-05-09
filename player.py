@@ -2,13 +2,14 @@ import pygame
 
 
 class Player:
-    def __init__(self, x, y, image, tile_size):
-        self.image = image
+    def __init__(self, x, y, image_manager, tile_size):
+        self.image_manager = image_manager
+        self.image = self.image_manager.load_all_images()['player']
         self.tile_size = tile_size
         self.rect = self.image.get_rect(topleft=(x * tile_size, y * tile_size))
         self.speed = 3
 
-    def handle_input_and_move(self, keys, level):
+    def handle_input_and_move(self, keys, level, bomb_manager):
         dx, dy = 0, 0
         old_rect = self.rect.copy()
 
@@ -35,8 +36,16 @@ class Player:
         if level.check_collision(self.rect):
             self.rect.y = old_rect.y
 
-    def update(self, keys, level):
-        self.handle_input_and_move(keys, level)
+        if keys[pygame.K_SPACE]:
+            # Calculate the bomb position on the grid
+            bomb_x = round(self.rect.x / self.tile_size)
+            bomb_y = round(self.rect.y / self.tile_size)
+
+            # Add a bomb through the bomb_manager
+            bomb_manager.add_bomb(bomb_x, bomb_y)
+
+    def update(self, keys, level, bomb_manager):
+        self.handle_input_and_move(keys, level, bomb_manager)
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
